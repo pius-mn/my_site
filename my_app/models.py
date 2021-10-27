@@ -21,8 +21,6 @@ class MpesaCalls(BaseModel):
         verbose_name = 'Mpesa Call'
         verbose_name_plural = 'Mpesa Calls'
 
-
-
     caller = models.TextField()
     conversation_id = models.TextField()
     content = models.TextField()
@@ -32,20 +30,16 @@ class MpesaCalls(BaseModel):
         verbose_name_plural = 'Mpesa Call Backs'
 
 
-class MpesaPayment(BaseModel):
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    description = models.TextField()
-    type = models.TextField()
-    reference = models.TextField()
-    first_name = models.CharField(max_length=100)
-    middle_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+class MpesaDeposits(BaseModel):
+
     phone_number = models.TextField()
-    organization_balance = models.DecimalField(max_digits=10, decimal_places=2)
+    reference = models.TextField()
+    transaction_date = models.TextField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
-        verbose_name = 'Mpesa Payment'
-        verbose_name_plural = 'Mpesa Payments'
+        verbose_name = 'Mpesa Deposit'
+        verbose_name_plural = 'Mpesa Deposits'
 
     def __str__(self):
-        return self.first_name
+        return self.phone_number

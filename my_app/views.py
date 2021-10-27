@@ -4,7 +4,7 @@ from requests.auth import HTTPBasicAuth
 import json
 from django.http import JsonResponse
 from .env import MpesaAccessToken, LipanaMpesaPpassword
-from .models import MpesaPayment
+from .models import MpesaDeposits
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -33,7 +33,7 @@ def lipa_na_mpesa_online(request):
         "PartyA": '254759267471',  # replace with your phone number to get stk push
         "PartyB": LipanaMpesaPpassword.Business_short_code,
         "PhoneNumber": '254759267471',  # replace with your phone number to get stk push
-        "CallBackURL": "https://sandbox.safaricom.co.ke/mpesa/",
+        "CallBackURL": "https://piusdeveloper.pythonanywhere.com/api/v1/c2b/confirmation",
         "AccountReference": "pius",
         "TransactionDesc": "Testing stk push"
     }
@@ -60,21 +60,18 @@ def validation(request):
         "ResultCode": 0,
         "ResultDesc": "Accepted"
     }
-    return JsonResponse(dict(context))
+    return JsonResponse(context)
 @csrf_exempt
 def confirmation(request):
     mpesa_body =request.body.decode('utf-8')
     mpesa_payment = json.loads(mpesa_body)
-    payment = MpesaPayment(
-        first_name=mpesa_payment['FirstName'],
-        last_name=mpesa_payment['LastName'],
-        middle_name=mpesa_payment['MiddleName'],
-        description=mpesa_payment['TransID'],
-        phone_number=mpesa_payment['MSISDN'],
-        amount=mpesa_payment['TransAmount'],
-        reference=mpesa_payment['BillRefNumber'],
-        organization_balance=mpesa_payment['OrgAccountBalance'],
-        type=mpesa_payment['TransactionType'],
+    payment = MpesaDeposits(
+       
+        phone_number=mpesa_payment['Body']['stkCallback']['CallbackMetadata']['Item'][4]['Value'],
+        reference=mpesa_payment['Body']['stkCallback']['CallbackMetadata']['Item'][1]['Value'],
+        transaction_date=mpesa_payment['Body']['stkCallback']['CallbackMetadata']['Item'][3]['Value'],
+        amount=mpesa_payment['Body']['stkCallback']['CallbackMetadata']['Item'][0]['Value'],
+       
     )
     payment.save()
     context = {
